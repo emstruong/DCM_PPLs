@@ -1,1 +1,5 @@
+In the notebook "DCM_EPR_Numpyro_Demo.ipynb", we present Bayesian inference applied to a dynamical causal model of ERP/EEG/MEG data. 
+We use NUTS in Numpyro, with the chains initialized at the tail of the Gamma prior distribution.
 
+In "DCM_EPR_Numpyro_MultimodalityRemedy.ipynb", we go deeper into the analysis. By following this process, you can skip the demo.
+Initially, we run the chains with default values. Then, we address the omnipresent multimodality in this model, dur high dimensionality and correlated parameters, by using weighted stacking as a remedy. Finally, we rerun the chains with initialization at the tail of the Gamma prior distribution for the sake of completeness. 
