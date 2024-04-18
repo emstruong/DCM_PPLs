@@ -3,3 +3,5 @@ We use NUTS in Numpyro, with the chains initialized at the tail of the Gamma pri
 
 In "DCM_EPR_Numpyro_MultimodalityRemedy.ipynb", we go deeper into the analysis. By following this process, you can skip the demo.
 Initially, we run the chains with default values. Then, we address the omnipresent multimodality in this model, dur high dimensionality and correlated parameters, by using weighted stacking as a remedy. Finally, we rerun the chains with initialization at the tail of the Gamma prior distribution for the sake of completeness. 
+
+The model implementation by JAX's JIT (Euler/Heun/Rk4) is located in the "ForwardModel" folder,  and the helper functions for visualization are located in the "Helper" folder.
