@@ -54,7 +54,7 @@ def my_axis(ax, params_labels):
 
 
 
-def plot_obsrvation(ts_model, xpy_model, ts_obs, xpy_obs):
+def plot_observation(ts_model, xpy_model, ts_obs, xpy_obs):
     plt.figure(figsize=(6,4))
     plt.plot(ts_model, xpy_model, color="b", lw=2,  alpha=0.8, label='model');
     plt.plot(ts_obs, xpy_obs, color="red", lw=1, marker=".", alpha=0.4, label='observation');
