@@ -55,7 +55,7 @@ def odeint_euler(f, y0, t, *args):
 
 
 
-def odeint_huen(f, y0, t, *args):
+def odeint_heun(f, y0, t, *args):
     def step(state, t):
         y_prev, t_prev = state
         h = t - t_prev
