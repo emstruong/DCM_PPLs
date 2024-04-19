@@ -13,9 +13,6 @@
 # 
 # :::
 
-
-
-
 import os
 import sys
 import time
@@ -28,9 +25,6 @@ import arviz as az
 import matplotlib.pyplot as plt
 
 
-
-
-
 import jax 
 import jax.numpy as jnp
 from jax import grad, vmap, lax, random
@@ -38,14 +32,10 @@ from jax.experimental.ode import odeint
 
 
 
-
-
 import numpyro as npr
 from numpyro import sample, plate, handlers
 import numpyro.distributions as dist
 from numpyro.infer import MCMC, NUTS, Predictive, init_to_value
-
-
 
 
 npr.set_platform("cpu")
@@ -63,18 +53,13 @@ print(f"Arviz version: {az.__version__}")
 
 
 
-
 import warnings
 warnings.filterwarnings('ignore')
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-
-
 az.style.use("arviz-darkgrid")
 colors_l = ["#A4C3D9", "#7B9DBF", "#52779F", "#2A537E"] 
-
-
 
 
 cwd = os.getcwd()
@@ -93,16 +78,12 @@ except OSError as e:
 
 ### Simulator
 
-
-from ForwardModel.ERPmodel_JAX import DCM_ERPmodel, odeint_euler, odeint_huen, odeint_rk4
+from ForwardModel.ERPmodel_JAX import DCM_ERPmodel, odeint_euler, odeint_heun, odeint_rk4
 from Helper.ERPhelper import *
-
 
 
 from jax import random
 rng_key = random.PRNGKey(0)
-
-
 
 
 tend = 200.0
@@ -112,19 +93,12 @@ ts = np.arange(t0, tend + dt, dt)
 nt = ts.shape[0]
 
 
-
-
 ns = 9
 x_init=np.zeros((ns))
 
 
-
-
 theta_true = np.array([0.42, 0.76, 0.15, 0.16, 12.13, 5.77, 27.87, 7.77, 1.63, 3.94])
 n_params = theta_true.shape[0]
-
-
-
 
 my_var_names = ['g_1', 'g_2', 'g_3', 'g_4', 'delta', 'tau_i', 'h_i', 'tau_e', 'h_e', 'u']
 
@@ -136,21 +110,19 @@ print('Running 1 simuation using different integrator of JAX odeint:')
 
 # Run the model
 
-
-
 start_time = time.time()
 
 xs_euler = odeint_euler(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similations took using Euler odeint (sec):" , (time.time() - start_time))
+print("similation took using Euler (sec):" , (time.time() - start_time))
 
 
 
 start_time = time.time()
 
-xs_huen = odeint_rk4(DCM_ERPmodel, x_init, ts, theta_true)
+xs_heun = odeint_heun(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similations took using Heun odeint (sec):" , (time.time() - start_time))
+print("similation took using Heun (sec):" , (time.time() - start_time))
 
 
 
@@ -159,16 +131,14 @@ start_time = time.time()
 
 xs_rk4 = odeint_rk4(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similations took using RK4 odeint (sec):" , (time.time() - start_time))
-
-
+print("similation took using RK4 (sec):" , (time.time() - start_time))
 
 
 
 plt.figure(figsize=(6,4))
-plt.plot(ts, xs_euler[:,8],'--', color='g', lw=4, label='JAX odeint Euler');
-plt.plot(ts, xs_huen[:,8],'--', color='b', lw=3, label='JAX odeint Heun');
-plt.plot(ts, xs_rk4[:,8],'--', color='r', lw=2, label='JAX odeint RK4');
+plt.plot(ts, xs_euler[:,8],'--', color='g', lw=4, label='JAX Euler');
+plt.plot(ts, xs_heun[:,8],'--', color='b', lw=3, label='JAX Heun');
+plt.plot(ts, xs_rk4[:,8],'--', color='r', lw=2, label='JAX RK4');
 plt.legend(fontsize=10, frameon=False, loc='upper right')
 plt.ylabel('Voltage [mV]', fontsize=14); 
 plt.xlabel('Time [ms]', fontsize=14); 
@@ -179,8 +149,6 @@ plt.savefig(os.path.join((output_dir),"Simulators.png"), dpi=300)
 
 
 # So, we use Euler integration, But don't worry about computional time! we put JAX's JIT on Odeint to make it more faster!
-
-
 
 @jax.jit
 def ERP_JAXOdeintSimuator(x_init, ts, params):
@@ -193,34 +161,29 @@ def ERP_JAXOdeintSimuator(x_init, ts, params):
 
 # The initial compilation takes a bit of time, but after that, it flies through the air!
 
+start_time = time.time()
+
+xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
+
+print("similation with compiling took (sec):" , (time.time() - start_time))
+
+
 
 
 start_time = time.time()
 
 xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
 
-print("similations with compiling took (sec):" , (time.time() - start_time))
+print("similation using JAX's JIT took (sec):" , (time.time() - start_time))
 
 
-
-
-start_time = time.time()
-
-xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
-
-print("similations using JAX's JIT took (sec):" , (time.time() - start_time))
-
-
-# ## Synthetic Observation
+### Synthetic Observation
 
 # We assume that we only have accessto the activity of pyramidfal neurons, and for the sake of sppeding the computational time, we downsample the simuations.
 
 
-
 #observation noise
 sigma_true = 0.1 
-
-
 
 
 xpy_jax = ERP_JAXOdeintSimuator(x_init, ts, theta_true)
@@ -228,10 +191,8 @@ x_noise = np.random.normal(loc=0, scale=sigma_true, size=xpy_jax.shape)
 x_py = xpy_jax + x_noise
 
 
-
 #downsampling
 ds=10
-
 
 
 ts_obs=ts[::ds]
@@ -239,31 +200,21 @@ xpy_obs=x_py[::ds]
 nt_obs=int(x_py[::ds].shape[0])
 
 
-
-
-
 data= { 'nt_obs': nt_obs, 'ds': ds, 'ts': ts, 'ts_obs': ts_obs, 'dt': dt, 'x_init': x_init, 'obs_err': sigma_true, 'xpy_obs': xpy_obs }
-
-
 
 
 plot_obsrvation(ts, xpy_jax, ts_obs, xpy_obs)
 plt.savefig(os.path.join((output_dir),"Observation.png"), dpi=300)
 
 
-# ## Prior
-
-
+### Prior
 
 shape=[18.16, 29.9, 29.14, 30.77, 22.87, 34.67, 20.44, 33.02, 24.17, 23.62]
 scale=[0.03, 0.02, 0.005, 0.007, 0.51, 0.23, 0.96, 0.16, 0.07, 0.13]
 rate = 1. / np.array(scale)
 
 
-
-
 prior_specs = dict(shape=shape, rate=rate)
-
 
 
 
@@ -301,17 +252,11 @@ def model(data, prior_specs):
         npr.sample('xpy_obs', dist.Normal(xpy_model, sigma_true), obs=xpy_obs)
 
 
-
-# ### Prior predictive check
-
-# In[38]:
-
+#### Prior predictive check
 
 n_ = 100
 prior_predictive = Predictive(model, num_samples=n_)
 prior_predictions = prior_predictive(rng_key, data, prior_specs)
-
-
 
 
 title='Prior Predictive Check'
@@ -319,7 +264,7 @@ plot_priorcheck(ts_obs, xpy_obs, prior_predictions, n_, title)
 plt.savefig(os.path.join((output_dir),"PriorPredictiveCheck.png"), dpi=300)
 
 
-# ## NUTS sampling 
+### NUTS sampling 
 
 #  Due to large dimentionality of problem and the nonlinear relation between parameeters, the multimodality is omnipresence in this case. In the follwing , we run 4 NUTS chains with default configurations that operates across diverse problems, but not necessarliy leads to convergence. Then we tune the algorithmic parameetrs for better convergence, however, resulting in multimodality. Finnaly, we propose the weighted stacking the chains as a solution to deal with this challnge. 
 
@@ -327,23 +272,16 @@ plt.savefig(os.path.join((output_dir),"PriorPredictiveCheck.png"), dpi=300)
 
 # Now we run the chains at the tail of prior to get convergence for all chains.
 
-
-
 n_warmup, n_samples, n_chains= 200, 200, 4
-
-
 
 
 tails_5th_percentile=tails_percentile(my_var_names, prior_predictions, 0.05)    
 init_to_low_prob = init_to_value(values=tails_5th_percentile)
 
 
-
-
 # NUTS set up
 kernel = NUTS(model, max_tree_depth=12,  dense_mass=False, adapt_step_size=True, init_strategy=init_to_low_prob)
 mcmc= MCMC(kernel, num_warmup=n_warmup, num_samples=n_samples, num_chains=n_chains, chain_method='parallel')
-
 
 
 print ("-"*60)
@@ -357,7 +295,6 @@ start_time = time.time()
 mcmc.run(rng_key, data, prior_specs, extra_fields=('potential_energy', 'num_steps', 'diverging'))
 
 
-
 print('Terminated the sampling.')
 print ("-"*60)
 print ("-"*60)
@@ -367,20 +304,11 @@ print(" All Chains using NUTS' Numpyro took (sec):" , (time.time() - start_time)
 
 # The values of r_hat ~1 show the convergence. This convergence leads to a large effective sample size.
 
-
-
-
 mcmc.print_summary(exclude_deterministic=True)
-
-
-
 
 
 lp = -mcmc.get_extra_fields()['potential_energy']
 print('Expected log joint density: {:.2f}'.format(np.mean(lp)))
-
-
-
 
 
 title='Converged chains'
@@ -388,8 +316,7 @@ plot_lp_chains(lp, n_chains, title)
 plt.savefig(os.path.join((output_dir),"Lp__.png"), dpi=300)
 
 
-# ### Posterior 
-
+#### Posterior 
 
 # Get posterior samples
 posterior_samples = mcmc.get_samples(group_by_chain=True)
@@ -398,9 +325,7 @@ pooled_posterior_samples = mcmc.get_samples()
 
 # vizualize with arviz
 
-
 az_obj = az.from_numpyro(mcmc)
-
 
 # showing the posterior samples of all chains
 
@@ -422,11 +347,8 @@ plt.tight_layout();
 plt.savefig(os.path.join((output_dir),"ConvergedChains.png"), dpi=300)
 
 
-
 chains_pooled = az_obj.posterior[my_var_names].to_array().values.reshape(n_params, -1)
 params_map_pooled=calcula_map(chains_pooled)
-
-
 
 
 title="Pooled Posteriors"
@@ -434,14 +356,11 @@ plot_posterior_pooled(my_var_names, theta_true, prior_predictions, chains_pooled
 plt.savefig(os.path.join((output_dir),"PooledPosterior.png"), dpi=300)
 
 
-# ### Fit and Posterior predictive check 
-
+#### Fit and Posterior predictive check 
 
 
 plot_fitted(data, az_obj.posterior)
 plt.savefig(os.path.join((output_dir),"Fitteddata.png"), dpi=300)
-
-
 
 
 
@@ -452,7 +371,6 @@ pooled_posterior_predictive_samples = pooled_posterior_predictive(rng_subkey, da
 ppc_=pooled_posterior_predictive_samples['xpy_model']
 xpy_per05_pooled=np.quantile(ppc_, 0.05, axis=0)
 xpy_per95_pooled=np.quantile(ppc_, 0.95, axis=0)
-
 
 
 
