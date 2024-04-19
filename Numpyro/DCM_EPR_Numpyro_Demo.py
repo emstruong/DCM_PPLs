@@ -97,7 +97,7 @@ ns = 9
 x_init=np.zeros((ns))
 
 
-theta_true = np.array([0.42, 0.76, 0.15, 0.16, 12.13, 5.77, 27.87, 7.77, 1.63, 3.94])
+theta_true = np.array([0.42, 0.76, 0.15, 0.16, 12.13, 7.77, 27.87, 5.77, 1.63, 3.94])
 n_params = theta_true.shape[0]
 
 my_var_names = ['g_1', 'g_2', 'g_3', 'g_4', 'delta', 'tau_i', 'h_i', 'tau_e', 'h_e', 'u']
@@ -105,7 +105,7 @@ my_var_names = ['g_1', 'g_2', 'g_3', 'g_4', 'delta', 'tau_i', 'h_i', 'tau_e', 'h
 
 print ("-"*60)
 print ("-"*60)
-print('Running 1 simuation using different integrator of JAX odeint:')
+print('Running 1 simulation using different integrator of JAX odeint:')
 
 
 # Run the model
@@ -114,7 +114,7 @@ start_time = time.time()
 
 xs_euler = odeint_euler(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similation took using Euler (sec):" , (time.time() - start_time))
+print("simulation took using Euler (sec):" , (time.time() - start_time))
 
 
 
@@ -122,7 +122,7 @@ start_time = time.time()
 
 xs_heun = odeint_heun(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similation took using Heun (sec):" , (time.time() - start_time))
+print("simulation took using Heun (sec):" , (time.time() - start_time))
 
 
 
@@ -131,7 +131,7 @@ start_time = time.time()
 
 xs_rk4 = odeint_rk4(DCM_ERPmodel, x_init, ts, theta_true)
 
-print("similation took using RK4 (sec):" , (time.time() - start_time))
+print("simulation took using RK4 (sec):" , (time.time() - start_time))
 
 
 
@@ -165,7 +165,7 @@ start_time = time.time()
 
 xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
 
-print("similation with compiling took (sec):" , (time.time() - start_time))
+print("simulation with compiling took (sec):" , (time.time() - start_time))
 
 
 
@@ -174,7 +174,7 @@ start_time = time.time()
 
 xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
 
-print("similation using JAX's JIT took (sec):" , (time.time() - start_time))
+print("simulation using JAX's JIT took (sec):" , (time.time() - start_time))
 
 
 ### Synthetic Observation
@@ -203,7 +203,7 @@ nt_obs=int(x_py[::ds].shape[0])
 data= { 'nt_obs': nt_obs, 'ds': ds, 'ts': ts, 'ts_obs': ts_obs, 'dt': dt, 'x_init': x_init, 'obs_err': sigma_true, 'xpy_obs': xpy_obs }
 
 
-plot_obsrvation(ts, xpy_jax, ts_obs, xpy_obs)
+plot_observation(ts, xpy_jax, ts_obs, xpy_obs)
 plt.savefig(os.path.join((output_dir),"Observation.png"), dpi=300)
 
 
