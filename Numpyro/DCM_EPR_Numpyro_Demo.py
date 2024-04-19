@@ -203,7 +203,7 @@ nt_obs=int(x_py[::ds].shape[0])
 data= { 'nt_obs': nt_obs, 'ds': ds, 'ts': ts, 'ts_obs': ts_obs, 'dt': dt, 'x_init': x_init, 'obs_err': sigma_true, 'xpy_obs': xpy_obs }
 
 
-plot_observation(ts, xpy_jax, ts_obs, xpy_obs)
+plot_observation(ts, xpy_jax, ts_obs, xpy_obs);
 plt.savefig(os.path.join((output_dir),"Observation.png"), dpi=300)
 
 
@@ -260,7 +260,7 @@ prior_predictions = prior_predictive(rng_key, data, prior_specs)
 
 
 title='Prior Predictive Check'
-plot_priorcheck(ts_obs, xpy_obs, prior_predictions, n_, title)
+plot_priorcheck(ts_obs, xpy_obs, prior_predictions, n_, title);
 plt.savefig(os.path.join((output_dir),"PriorPredictiveCheck.png"), dpi=300)
 
 
@@ -312,7 +312,7 @@ print('Expected log joint density: {:.2f}'.format(np.mean(lp)))
 
 
 title='Converged chains'
-plot_lp_chains(lp, n_chains, title)
+plot_lp_chains(lp, n_chains, title);
 plt.savefig(os.path.join((output_dir),"Lp__.png"), dpi=300)
 
 
@@ -352,14 +352,14 @@ params_map_pooled=calcula_map(chains_pooled)
 
 
 title="Pooled Posteriors"
-plot_posterior_pooled(my_var_names, theta_true, prior_predictions, chains_pooled, title)
+plot_posterior_pooled(my_var_names, theta_true, prior_predictions, chains_pooled, title);
 plt.savefig(os.path.join((output_dir),"PooledPosterior.png"), dpi=300)
 
 
 #### Fit and Posterior predictive check 
 
 
-plot_fitted(data, az_obj.posterior)
+plot_fitted(data, az_obj.posterior);
 plt.savefig(os.path.join((output_dir),"Fitteddata.png"), dpi=300)
 
 
@@ -375,7 +375,7 @@ xpy_per95_pooled=np.quantile(ppc_, 0.95, axis=0)
 
 
 title='Posterior Predictive Check'
-plot_posteriorcheck(data, xpy_per05_pooled, xpy_per95_pooled, title)
+plot_posteriorcheck(data, xpy_per05_pooled, xpy_per95_pooled, title);
 plt.savefig(os.path.join((output_dir),"PosteriorPredictiveCheck.png"), dpi=300)
 
 
