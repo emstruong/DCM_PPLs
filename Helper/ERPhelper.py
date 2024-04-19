@@ -42,31 +42,6 @@ def calcula_map (chains_):
 
 
 
-def low_prob_sample(my_var_names, prior_predictions):
-    
-    gamma_prior_q = np.array([prior_predictions[prm] for prm in my_var_names]).T
-    
-    np.random.seed(0)
-    q_low_lim = np.quantile(gamma_prior_q, 0.0, axis=0)
-    q_low = np.quantile(gamma_prior_q, 0.025, axis=0)
-    q_high = np.quantile(gamma_prior_q, 0.975, axis=0)
-    q_high_lim = np.quantile(gamma_prior_q, 1.0, axis=0)
-
-    prob = np.array([q_low - q_low_lim, q_high_lim - q_high])
-    prob = prob / prob.sum(axis=0) # Normalize to sum up to one
-    
-    n_params=int(len(my_var_names))
-    
-    np.random.seed(0)
-    low_prob_sample_vals = []
-    for iprm in range(n_params) :
-        low_prob_sample_vals.append(np.random.choice([np.random.uniform(q_low_lim[iprm], q_low[iprm]),
-                                                 np.random.uniform(q_high[iprm], q_high_lim[iprm])], 
-                                                 p=prob[:, iprm]))
-        
-    return gamma_prior_q, low_prob_sample_vals     
-
-
 
 
 
@@ -324,21 +299,41 @@ def plot_out_of_sample_ppc_values(data, ERP_JAXOdeintSimuator, joint_sample_pool
 
 
 
-def plot_prior_tail(my_var_names, prior_predictions):
+def low_prob_sample(my_var_names, prior_predictions):
     
-    gamma_prior_q, low_prob_sample_vals =low_prob_sample(my_var_names, prior_predictions)
+    prior_q = np.array([prior_predictions[prm] for prm in my_var_names]).T
+    
+    q_low_lim = np.quantile(prior_q, 0.0, axis=0)
+    q_low = np.quantile(prior_q, 0.025, axis=0)
+    q_high = np.quantile(prior_q, 0.975, axis=0)
+    q_high_lim = np.quantile(prior_q, 1.0, axis=0)
 
-    np.random.seed(0)
-    q_low_lim = np.quantile(gamma_prior_q, 0.0, axis=0)
-    q_low = np.quantile(gamma_prior_q, 0.025, axis=0)
-    q_high = np.quantile(gamma_prior_q, 0.975, axis=0)
-    q_high_lim = np.quantile(gamma_prior_q, 1.0, axis=0)
+    prob = np.array([q_low - q_low_lim, q_high_lim - q_high])
+    prob = prob / prob.sum(axis=0) # Normalize to sum up to one
+    
+    n_params=int(len(my_var_names))
+
+    low_prob_sample_vals = []
+    for iprm in range(n_params) :
+        low_prob_sample_vals.append(np.random.choice([np.random.uniform(q_low_lim[iprm], q_low[iprm]),
+                                                 np.random.uniform(q_high[iprm], q_high_lim[iprm])], 
+                                                 p=prob[:, iprm]))
+        
+    q_=[q_low_lim, q_low, q_high, q_high_lim]    
+    return prior_q, low_prob_sample_vals, q_     
+
+
+
+def plot_prior_tail(my_var_names, theta_true, prior_q, low_prob_sample_vals, q_):
+    
+
+    q_low_lim, q_low, q_high, q_high_lim=q_[0], q_[1], q_[2], q_[3], 
 
     
     fig, ax = plt.subplots(ncols=5, nrows=2, figsize=(15, 5))
     for iprm, prm in enumerate(my_var_names) :
         a = ax[iprm//5, iprm%5]
-        sns.kdeplot(gamma_prior_q[:, iprm], color='green', ax=ax[iprm//5, iprm%5], cut=0, label='prior')
+        sns.kdeplot(prior_q[:, iprm], color='lime', ax=ax[iprm//5, iprm%5], cut=0, label='prior')
 
         kde_x, kde_y = ax[iprm//5, iprm%5].lines[0].get_data()
         ax[iprm//5, iprm%5].fill_between(kde_x, kde_y, 
@@ -349,16 +344,16 @@ def plot_prior_tail(my_var_names, prior_predictions):
         ax[iprm//5, iprm%5].annotate('', xy=(low_prob_sample_vals[iprm], 0), 
                                      xytext=(low_prob_sample_vals[iprm], 0.5*ylim),
                                      horizontalalignment="center",
-                                     arrowprops=dict(arrowstyle='->',lw=1, color='m'))
-        ax[iprm//5, iprm%5].scatter(low_prob_sample_vals[iprm], 0.52*ylim, color='gold', s=40, label='init sample')
+                                     arrowprops=dict(arrowstyle='->',lw=2, color='y'))
+        ax[iprm//5, iprm%5].scatter(low_prob_sample_vals[iprm], 0.52*ylim, color='orange', s=50, label='init sample')
+        a.axvline(theta_true[iprm], color='r', label='true', linestyle='--')
 
         if iprm % 5 == 0 or iprm % 5 == 4: 
             a.set_ylabel('Density') 
         else:
             a.set_ylabel('')
+    my_axis(ax, my_var_names)           
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.suptitle("Initial values from the tail of prior", fontsize=18)  
     fig.tight_layout(rect=[0, 0, 1, 1])  
-
-
 
