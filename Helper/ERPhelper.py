@@ -38,7 +38,10 @@ def calcula_map (chains_):
         x_value_at_peak = (bin_edges[max_bin_index] + bin_edges[max_bin_index + 1]) / 2
         params_map.append(x_value_at_peak)
     return params_map
-    
+
+
+
+
 
 
 
@@ -203,7 +206,7 @@ def plot_posterior_multimodal(my_var_names, theta_true, prior_predictions, az_ob
 
 
 
-def plot_posterior_stackedmultimodal(my_var_names, theta_true, prior_predictions, az_obj_posterior, chains_stacked, title):
+def plot_posterior_pooled_multimodal(my_var_names, theta_true, prior_predictions, az_obj_posterior, chains_stacked, title):
 
     n_chains = az_obj_posterior.dims['chain']
 
@@ -213,7 +216,7 @@ def plot_posterior_stackedmultimodal(my_var_names, theta_true, prior_predictions
         a.set_xlabel(prm)
         a.axvline(theta_true[iprm], color='r', label='true', linestyle='--')
         #sns.kdeplot(prior_predictions[prm], ax=a, color='lime', alpha=0.9,  lw=2, linestyle='-', label='prior')
-        sns.kdeplot(chains_stacked[iprm], color='gold', ax=a, lw=2, label='stack posteior', shade=True, zorder=3)
+        sns.kdeplot(chains_stacked[iprm], color='gold', ax=a, lw=2, label='pooled posteior', shade=True, zorder=3)
 
         for ichain in range(n_chains):
             sns.kdeplot(az_obj_posterior[prm][ichain, :], ax=a, alpha=0.7,  color=colors_l[ichain], label='chaque posterior')
