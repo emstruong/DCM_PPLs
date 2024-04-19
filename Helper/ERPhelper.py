@@ -101,6 +101,7 @@ def plot_lp_chains(lp, n_chains, title):
     plt.legend(bbox_to_anchor=(.9, 1), loc='upper left', fontsize=10)
     plt.title(title, fontsize=14)  
     plt.tight_layout();
+    return fig, ax
 
 
 
@@ -120,7 +121,7 @@ def plot_posterior_pooled(my_var_names, theta_true, prior_predictions, chains_po
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.suptitle(title, fontsize=18) 
     fig.tight_layout(rect=[0, 0, 1, 1])  
-
+    return fig, ax
 
 
 
@@ -132,18 +133,19 @@ def plot_fitted(data, az_obj_posterior):
 
     n_chains = az_obj_posterior.dims['chain']
 
-    fig, axs = plt.subplots(1, 4, figsize=(12, 3))
+    fig, ax = plt.subplots(1, 4, figsize=(12, 3))
     for ich in range(n_chains):
-        axs[ich].plot(ts_obs, xpy_obs, '.', color='red', lw=3, label='obs')
-        axs[ich].plot(ts_obs, az_obj_posterior['xpy_model'][ich, :, :].mean(axis=0), lw=2, color='b', label='fit')
-        axs[ich].set_title(f'Fitted data for chain={ich+1}', fontsize=12)
-        axs[ich].legend(fontsize=10, frameon=False, loc='upper right')
-        axs[ich].set_xlabel('Time [ms]', fontsize=12)
-        axs[ich].tick_params(axis='both', which='major', labelsize=10)
-        axs[ich].tick_params(axis='both', which='minor', labelsize=8)
+        ax[ich].plot(ts_obs, xpy_obs, '.', color='red', lw=3, label='obs')
+        ax[ich].plot(ts_obs, az_obj_posterior['xpy_model'][ich, :, :].mean(axis=0), lw=2, color='b', label='fit')
+        ax[ich].set_title(f'Fitted data for chain={ich+1}', fontsize=12)
+        ax[ich].legend(fontsize=10, frameon=False, loc='upper right')
+        ax[ich].set_xlabel('Time [ms]', fontsize=12)
+        ax[ich].tick_params(axis='both', which='major', labelsize=10)
+        ax[ich].tick_params(axis='both', which='minor', labelsize=8)
         if  ich==0:   
-            axs[ich].set_ylabel('Voltage [mV]', fontsize=12)
+            ax[ich].set_ylabel('Voltage [mV]', fontsize=12)
     plt.tight_layout()
+    return fig, ax
 
 
 
@@ -182,6 +184,7 @@ def plot_corr(corr_vals, params_labels):
     cbar = ax.collections[0].colorbar
     cbar.ax.tick_params(labelsize=8)
     ax.tick_params(labelsize=12)
+    return fig, ax
 
     
 
@@ -202,7 +205,7 @@ def plot_posterior_multimodal(my_var_names, theta_true, prior_predictions, az_ob
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.suptitle(title, fontsize=18)  
     fig.tight_layout(rect=[0, 0, 1, 1]) 
-
+    return fig, ax
 
 
 
@@ -224,11 +227,12 @@ def plot_posterior_pooled_multimodal(my_var_names, theta_true, prior_predictions
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.suptitle(title, fontsize=18)  
     fig.tight_layout(rect=[0, 0, 1, 1]) 
+    return fig, ax
 
 
 
 
-def out_of_samples_ppc_vales(data, ERP_JAXOdeintSimuator, chains_, n_):
+def out_of_samples_ppc_values(data, ERP_JAXOdeintSimuator, chains_, n_):
     
     dt = data['dt']
     ts = data['ts']
@@ -356,4 +360,6 @@ def plot_prior_tail(my_var_names, theta_true, prior_q, low_prob_sample_vals, q_)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.suptitle("Initial values from the tail of prior", fontsize=18)  
     fig.tight_layout(rect=[0, 0, 1, 1])  
+    return fig, ax
+
 
