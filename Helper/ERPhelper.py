@@ -38,30 +38,7 @@ def calcula_map (chains_):
         x_value_at_peak = (bin_edges[max_bin_index] + bin_edges[max_bin_index + 1]) / 2
         params_map.append(x_value_at_peak)
     return params_map
-
-
-
-def low_prob_sample(my_var_names, prior_predictions):
     
-    prior_q = np.array([prior_predictions[prm] for prm in my_var_names]).T
-    
-    q_low_lim = np.quantile(prior_q, 0.0, axis=0)
-    q_low = np.quantile(prior_q, 0.025, axis=0)
-    q_high = np.quantile(prior_q, 0.975, axis=0)
-    q_high_lim = np.quantile(prior_q, 1.0, axis=0)
-
-    prob = np.array([q_low - q_low_lim, q_high_lim - q_high])
-    prob = prob / prob.sum(axis=0) # Normalize to sum up to one
-    
-    n_params=int(len(my_var_names))
-    
-    low_prob_sample_vals = []
-    for iprm in range(n_params) :
-        low_prob_sample_vals.append(np.random.choice([np.random.uniform(q_low_lim[iprm], q_low[iprm]),
-                                                 np.random.uniform(q_high[iprm], q_high_lim[iprm])], 
-                                                 p=prob[:, iprm]))
-        
-    return prior_q, low_prob_sample_vals  
 
 
 
