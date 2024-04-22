@@ -70,7 +70,7 @@ def plot_observation(ts_model, xpy_model, ts_obs, xpy_obs):
 
 def plot_priorcheck(ts_obs, xpy_obs, prior_predictions, n_, title):
     plt.figure(figsize=(6, 5))
-    plt.plot(ts_obs, xpy_obs ,'.-', color='b', lw=1, label='observation');
+    plt.plot(ts_obs, xpy_obs ,'.-', color='r', lw=1, label='observation');
     for i in range(n_):
         plt.plot(ts_obs, prior_predictions['xpy_model'][i], lw=1, alpha=0.2)
     plt.plot(ts_obs, prior_predictions['xpy_model'][i], lw=1, alpha=0.2, label='prior samples')    
