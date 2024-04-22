@@ -133,7 +133,7 @@ def plot_fitted(data, az_obj_posterior):
 
     n_chains = az_obj_posterior.dims['chain']
 
-    fig, ax = plt.subplots(1, 4, figsize=(12, 3))
+    fig, ax = plt.subplots(1, n_chains, figsize=(12, 3))
     for ich in range(n_chains):
         ax[ich].plot(ts_obs, xpy_obs, '.', color='red', lw=3, label='obs')
         ax[ich].plot(ts_obs, az_obj_posterior['xpy_model'][ich, :, :].mean(axis=0), lw=2, color='b', label='fit')
@@ -191,7 +191,8 @@ def plot_corr(corr_vals, params_labels):
 def plot_posterior_multimodal(my_var_names, theta_true, prior_predictions, az_obj_posterior, title):
 
     n_chains = az_obj_posterior.dims['chain']
-
+    colors_l = sns.color_palette('Blues_d', n_chains)
+    
     fig, ax = plt.subplots(ncols=5, nrows=2, figsize=(15, 5))
     for iprm, prm in enumerate(my_var_names) :
         a = ax[iprm//5, iprm%5]
