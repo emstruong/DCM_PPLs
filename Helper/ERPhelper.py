@@ -15,16 +15,15 @@ colors_l = ["#A4C3D9", "#7B9DBF", "#52779F", "#2A537E"]
 
 
 
+
 def tails_percentile(my_var_names, prior_predictions, thr):
     tails_xth_percentile = {}
     for key, value in prior_predictions.items():
         if key in my_var_names:
-            sorted_values = np.sort(value)
+            sorted_values = np.sort(value)[0, :] if value.shape[0] == 1 else np.sort(value)
             top_xth_percentile = sorted_values[int(0.05 * len(sorted_values))]
             tails_xth_percentile[key] = np.array(top_xth_percentile)
     return tails_xth_percentile
-
-
 
 
 def calcula_map (chains_):
