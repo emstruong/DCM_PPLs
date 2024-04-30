@@ -123,7 +123,6 @@ def plot_posterior_pooled(my_var_names, theta_true, prior_predictions, chains_po
     return fig, ax
 
 
-
 def plot_fitted(data, az_obj_posterior):
 
     ts_obs = data['ts_obs']
@@ -132,17 +131,21 @@ def plot_fitted(data, az_obj_posterior):
 
     n_chains = az_obj_posterior.dims['chain']
 
-    fig, ax = plt.subplots(1, n_chains, figsize=(12, 3))
+    fig, ax = plt.subplots(1, n_chains, figsize=(3*n_chains, 3))
     for ich in range(n_chains):
-        ax[ich].plot(ts_obs, xpy_obs, '.', color='red', lw=3, label='obs')
-        ax[ich].plot(ts_obs, az_obj_posterior['xpy_model'][ich, :, :].mean(axis=0), lw=2, color='b', label='fit')
-        ax[ich].set_title(f'Fitted data for chain={ich+1}', fontsize=12)
-        ax[ich].legend(fontsize=10, frameon=False, loc='upper right')
-        ax[ich].set_xlabel('Time [ms]', fontsize=12)
-        ax[ich].tick_params(axis='both', which='major', labelsize=10)
-        ax[ich].tick_params(axis='both', which='minor', labelsize=8)
+        if n_chains == 1 :
+            a = ax 
+        else :
+            a = ax[ich]    
+        a.plot(ts_obs, xpy_obs, '.', color='red', lw=3, label='obs')
+        a.plot(ts_obs, az_obj_posterior['xpy_model'][ich, :, :].mean(axis=0), lw=2, color='b', label='fit')
+        a.set_title(f'Fitted data for chain={ich+1}', fontsize=12)
+        a.legend(fontsize=10, frameon=False, loc='upper right')
+        a.set_xlabel('Time [ms]', fontsize=12)
+        a.tick_params(axis='both', which='major', labelsize=10)
+        a.tick_params(axis='both', which='minor', labelsize=8)
         if  ich==0:   
-            ax[ich].set_ylabel('Voltage [mV]', fontsize=12)
+            a.set_ylabel('Voltage [mV]', fontsize=12)
     plt.tight_layout()
     return fig, ax
 
