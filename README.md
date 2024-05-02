@@ -4,6 +4,9 @@ The aim is to provide inference services for Dynamic Causal Modeling of Event-Re
 Numpyro: https://num.pyro.ai/en/stable/
 
 
+Blackjax: https://blackjax-devs.github.io/blackjax/
+
+
 PyMC: https://www.pymc.io/welcome.html
 
 
