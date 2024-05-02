@@ -151,7 +151,7 @@ plt.savefig(os.path.join((output_dir),"Simulators.png"), dpi=300)
 # So, we use Euler integration, But don't worry about computional time! we put JAX's JIT on Odeint to make it more faster!
 
 @jax.jit
-def ERP_JAXOdeintSimuator(x_init, ts, params):
+def ERP_JAXOdeintSimulator(x_init, ts, params):
 
     xs_rk4 = odeint_euler(DCM_ERPmodel, x_init, ts, params)    
     x_py=xs_rk4[:,8]
@@ -163,7 +163,7 @@ def ERP_JAXOdeintSimuator(x_init, ts, params):
 
 start_time = time.time()
 
-xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
+xpy_jax=ERP_JAXOdeintSimulator(x_init, ts, theta_true)
 
 print("simulation with compiling took (sec):" , (time.time() - start_time))
 
@@ -172,7 +172,7 @@ print("simulation with compiling took (sec):" , (time.time() - start_time))
 
 start_time = time.time()
 
-xpy_jax=ERP_JAXOdeintSimuator(x_init, ts, theta_true)
+xpy_jax=ERP_JAXOdeintSimulator(x_init, ts, theta_true)
 
 print("simulation using JAX's JIT took (sec):" , (time.time() - start_time))
 
@@ -186,7 +186,7 @@ print("simulation using JAX's JIT took (sec):" , (time.time() - start_time))
 sigma_true = 0.1 
 
 
-xpy_jax = ERP_JAXOdeintSimuator(x_init, ts, theta_true)
+xpy_jax = ERP_JAXOdeintSimulator(x_init, ts, theta_true)
 x_noise = np.random.normal(loc=0, scale=sigma_true, size=xpy_jax.shape)
 x_py = xpy_jax + x_noise
 
@@ -244,7 +244,7 @@ def model(data, prior_specs):
     params_samples=[g_1, g_2, g_3, g_4, delta, tau_i,  h_i, tau_e, h_e, u]
     
     #Forward model
-    xpy_hat=ERP_JAXOdeintSimuator(x_init, ts, params_samples)[::ds]
+    xpy_hat=ERP_JAXOdeintSimulator(x_init, ts, params_samples)[::ds]
     
     # Likelihood
     with plate('data', size=nt_obs):
