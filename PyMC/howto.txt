@@ -1,1 +1,15 @@
 
+#Better install pymc on virtual env to avoid conflicts with existing packages
+#create virtual environment
+#! python3 -m venv .pymc_env 
+
+#in local repository:
+#run: 
+#source .pymc_env/bin/activate
+#then
+#pip install ipykernel
+#ipython kernel install --user --name=projectname
+#pip install rpy2
+
+#open notebook with environment activated and choose kernel pymc_env
+#check that it points to the environment:
