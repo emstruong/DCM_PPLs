@@ -249,7 +249,9 @@ def model(data, prior_specs):
     # Likelihood
     with plate('data', size=nt_obs):
         xpy_model = npr.deterministic('xpy_model', xpy_hat)
-        npr.sample('xpy_obs', dist.Normal(xpy_model, sigma_true), obs=xpy_obs)
+        npr.sample('xpy_obs', dist.Normal(xpy_model, obs_err), obs=xpy_obs)
+        xpy_ppc = npr.sample('xpy_ppc', dist.Normal(xpy_model, obs_err))
+
 
 
 #### Prior predictive check
@@ -304,7 +306,7 @@ print(" All Chains using NUTS' Numpyro took (sec):" , (time.time() - start_time)
 
 # The values of r_hat ~1 show the convergence. This convergence leads to a large effective sample size.
 
-mcmc.print_summary(exclude_deterministic=True)
+print(az.summary(mcmc, var_names=my_var_names))
 
 
 lp = -mcmc.get_extra_fields()['potential_energy']
@@ -364,11 +366,12 @@ plt.savefig(os.path.join((output_dir),"Fitteddata.png"), dpi=300)
 
 
 
-pooled_posterior_predictive = Predictive(model=model, posterior_samples=pooled_posterior_samples)
+pooled_posterior_predictive = Predictive(model=model, posterior_samples=pooled_posterior_samples, 
+                                                      return_sites=['xpy_ppc'])
 rng_key, rng_subkey = random.split(key=rng_key)
 pooled_posterior_predictive_samples = pooled_posterior_predictive(rng_subkey, data, prior_specs)
 
-ppc_=pooled_posterior_predictive_samples['xpy_model']
+ppc_=pooled_posterior_predictive_samples['xpy_ppc']
 xpy_per05_pooled=np.quantile(ppc_, 0.05, axis=0)
 xpy_per95_pooled=np.quantile(ppc_, 0.95, axis=0)
 
