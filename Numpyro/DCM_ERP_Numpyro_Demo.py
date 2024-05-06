@@ -37,6 +37,28 @@ from numpyro import sample, plate, handlers
 import numpyro.distributions as dist
 from numpyro.infer import MCMC, NUTS, Predictive, init_to_value
 
+import os
+import multiprocessing
+
+#set up for parallelizing the chains
+
+def setup_parallelization():
+    num_cores = multiprocessing.cpu_count()
+    os.environ["XLA_FLAGS"] = f"--xla_force_host_platform_device_count={num_cores}"
+    jax.config.update("jax_enable_x64", True)
+    jax.config.update("jax_platform_name", "cpu")
+    print(f"Number of CPU cores: {num_cores}")
+    print(f"Using devices: {jax.devices('cpu')}")
+
+
+enable_parallelization = True
+
+if enable_parallelization:
+    setup_parallelization()
+    print("Parallelizing chains.")
+else:
+    print("Skipping parallelization setup.")
+        
 
 npr.set_platform("cpu")
 
