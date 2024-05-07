@@ -391,7 +391,7 @@ def setlim_as_percent_of_data(x, y, ax, pct=0.95) :
                         
         
 def plot_pairs_surperimposed(traces_dict, 
-                             var_names, 
+                             my_var_names, 
                              true_values_dict=None,
                              main_palette=None,
                              scatter_kwargs=None,
