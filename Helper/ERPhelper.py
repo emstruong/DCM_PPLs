@@ -440,6 +440,11 @@ def plot_pairs_surperimposed(traces_dict,
                                 color=main_palette[i_tr], 
                                 )
                     ax[i, i].set(ylabel='', xlabel='')
+                    if true_values_dict is not None :
+						ax[i, i].axvline(true_values_dict[my_var_names[i]], 
+                        color=true_kwargs_['c'], 
+                        linestyle=':', 
+                        linewidth=3)
                     
                 else :
                     ax[i, j].set_visible(False)   
