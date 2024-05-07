@@ -9,7 +9,9 @@ import seaborn as sns
 import arviz as az
 import matplotlib.pyplot as plt
 
-
+from matplotlib.collections import PathCollection
+from matplotlib.legend_handler import HandlerPathCollection
+marker_size = 150
 
 colors_l = ["#A4C3D9", "#7B9DBF", "#52779F", "#2A537E"] 
 
@@ -366,3 +368,98 @@ def plot_prior_tail(my_var_names, theta_true, prior_q, low_prob_sample_vals, q_)
     return fig, ax
 
 
+def update_prop(handle, orig):
+    handle.update_from(orig)
+    handle.set_sizes([marker_size])
+        
+        
+def big_legend_markers(fig, fontsize=20) :
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    unique = [(h, l) for i, (h, l) in enumerate(zip(lines, labels)) if l not in labels[:i]]
+    legend = fig.legend(*zip(*unique), bbox_to_anchor=(0.225, 1), fontsize=fontsize, frameon=False,
+                        handler_map={PathCollection: HandlerPathCollection(update_func=update_prop)})
+    
+    
+def setlim_as_percent_of_data(x, y, ax, pct=0.95) :
+    qx_low, qx_high = np.quantile(x, (1-pct)/2), np.quantile(x, pct+(1-pct)/2)
+    qy_low, qy_high = np.quantile(y, (1-pct)/2), np.quantile(y, pct+(1-pct)/2)
+    x_low, x_high = ax.get_xlim()
+    y_low, y_high = ax.get_ylim()
+    ax.set_xlim(max(qx_low, x_low), min(qx_high, x_high))
+    ax.set_ylim(max(qy_low, y_low), min(qy_high, y_high))
+                        
+        
+def plot_pairs_surperimposed(traces_dict, 
+                             var_names, 
+                             true_values_dict=None,
+                             main_palette=None,
+                             scatter_kwargs=None,
+                             kde_kwargs=None,
+                             true_kwargs=None,
+                             z_orders=None) :
+    
+    traces = traces_dict.values()
+    traces_names = list(traces_dict.keys())
+    n_params = len(my_var_names)
+    
+    fig, ax = plt.subplots(n_params, n_params, figsize=(2.5*n_params, 2.5*n_params))
+    
+
+    scatter_kwargs_ = dict(marker='o', s=4)
+    kde_kwargs_ = dict(linewidth=3)
+    true_kwargs_ = dict(marker='*', c='r', edgecolors='k', s=200)
+    if scatter_kwargs is not None :
+        scatter_kwargs_.update(scatter_kwargs)
+    if main_palette is None :
+        main_palette = sns.color_palette('viridis', len(traces))
+    if kde_kwargs is not None :
+        kde_kwargs_.update(kde_kwargs)
+    if true_kwargs is not None :
+        true_kwargs_.update(true_kwargs)
+    if z_orders is None :
+        z_orders = range(len(traces))
+        
+    for i_tr, tr in enumerate(traces) :
+        samples = az.extract(tr)
+        for i in range(n_params):
+            for j in range(n_params):
+                if j < i:
+                    sc=ax[i, j].scatter(x=samples[my_var_names[i]],
+                                        y=samples[my_var_names[j]],
+                                        zorder=z_orders[i_tr], 
+                                        label=traces_names[i_tr],
+                                        color=main_palette[i_tr],
+                                        **scatter_kwargs_)
+                    
+
+                        
+                elif i==j :
+                    sns.kdeplot(x=samples[my_var_names[i]], 
+                                ax=ax[i, i],
+                                color=main_palette[i_tr], 
+                                )
+                    ax[i, i].set(ylabel='', xlabel='')
+                    
+                else :
+                    ax[i, j].set_visible(False)   
+            
+            
+    if true_values_dict is not None :      
+        for j in range(n_params-1) :
+            for i in range(j+1, n_params) :
+                ax[i, j].scatter(true_values_dict[my_var_names[i]], 
+                                 true_values_dict[my_var_names[j]],  
+                                 label='true',
+                                **true_kwargs_)
+                        
+                        
+    for i in range(n_params) :
+        ax[-1, i].set_xlabel(my_var_names[i], size=20)   
+        ax[i, 0].set_ylabel(my_var_names[i], size=20, labelpad=10)
+    ax[0, 0].set_title('Density', loc='left', pad=10, size=20)
+    
+    big_legend_markers(fig)
+    sns.despine(offset=5)
+    
+    return fig, ax
