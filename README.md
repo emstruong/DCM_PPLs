@@ -1,4 +1,4 @@
-The aim is to provide inference services for Dynamic Causal Modeling of Event-Related Potentials (ERPs) measured with EEG/MEG, using SATO Probabilistic Programming Languages (PPLs):
+The aim is to provide inference services for Dynamical Causal Modeling of Event-Related Potentials (ERPs) measured with EEG/MEG, using SATO Probabilistic Programming Languages (PPLs):
 
 
 Numpyro: https://num.pyro.ai/en/stable/
