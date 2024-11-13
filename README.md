@@ -14,7 +14,7 @@ Stan: https://mc-stan.org/
 
 
 ```
-@article{Baldy2024,
+@article{Baldy2024AutoDCM,
   title={Dynamic Causal Modeling in Probabilistic Programming Languages},
   author={Baldy, Nina and Woodman, Marmaduke and Jirsa, Viktor and Hashemi, Meysam},
   journal={bioRxiv},
