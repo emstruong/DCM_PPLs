@@ -1,3 +1,6 @@
+
+![DCM_PPLs](https://github.com/user-attachments/assets/d16ff5e7-18f4-4baf-b281-694c799ae906)
+
 The aim is to provide inference services for Dynamical Causal Modeling of Event-Related Potentials (ERPs) measured with EEG/MEG, using SATO Probabilistic Programming Languages (PPLs):
 
 
@@ -14,13 +17,15 @@ Stan: https://mc-stan.org/
 
 
 ```
-@article{Baldy2024AutoDCM,
-  title={Dynamic Causal Modeling in Probabilistic Programming Languages},
-  author={Baldy, Nina and Woodman, Marmaduke and Jirsa, Viktor and Hashemi, Meysam},
-  journal={bioRxiv},
-  pages={2024--11},
-  year={2024},
-  publisher={Cold Spring Harbor Laboratory}
+@article{DCM_PPLs,
+author = {Baldy, Nina  and Woodman, Marmaduke  and Jirsa, Viktor K.  and Hashemi, Meysam},
+title = {Dynamic causal modelling in probabilistic programming languages},
+journal = {Journal of The Royal Society Interface},
+volume = {22},
+number = {227},
+pages = {20240880},
+year = {2025},
+doi = {10.1098/rsif.2024.0880},
 }
 ```
 
